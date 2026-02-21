@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
+import { storeToRefs } from "pinia"
 
-const indicators = [
-	{ name: "Feels Like", value: "64°" }, { name: "Humidity", value: "46%" },
-	{ name: "Wind", value: "2 km/h" }, { name: "Precipitation", value: "0 in" }
-];
+const currentWeatherStore = useCurrentWeatherStore();
+const { weather, units } = storeToRefs(currentWeatherStore);
+
+const indicators = computed(() => [
+	{ name: "Feels Like", value: `${weather.value.feelsLike}°` },
+	{ name: "Humidity", value: `${weather.value.humidity}%` },
+	{ name: "Wind", value: `${weather.value.windSpeed} ${units.value.windSpeed}` },
+	{ name: "Precipitation", value: `${weather.value.precipitation} ${units.value.precipitation}` }
+]);
 </script>
 
 <template>

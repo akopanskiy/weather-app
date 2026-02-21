@@ -1,16 +1,24 @@
 <script setup lang="ts">
+import { useLocationStore } from "@/stores/location.ts";
+import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
+import { storeToRefs } from "pinia"
+
+const locationStore = useLocationStore();
+const currentWeatherStore = useCurrentWeatherStore();
+const { city, country } = storeToRefs(locationStore);
+const { weather } = storeToRefs(currentWeatherStore);
 
 </script>
 
 <template>
 	<div class="wrapper">
 		<div class="left-info">
-			<span class="place">Dnipro, Ukraine</span>
+			<span class="place">{{ city }}, {{ country }}</span>
 			<span class="date">Tuesday, Feb 11, 2026</span>
 		</div>
 		<div class="right-info">
 			<img src="/icon-sunny.webp" alt="weather icon" width="110" height="110 "/>
-			<span class="temperature">0°</span>
+			<span class="temperature">{{ weather.temperature }}°</span>
 		</div>
 	</div>
 </template>
