@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useLocationStore } from "@/stores/location.ts";
 import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
-import { storeToRefs } from "pinia"
+import { storeToRefs } from "pinia";
+import dayjs from "dayjs";
 
 const locationStore = useLocationStore();
 const currentWeatherStore = useCurrentWeatherStore();
 const { city, country } = storeToRefs(locationStore);
 const { weather } = storeToRefs(currentWeatherStore);
+
+const currentTime = computed(() =>
+		dayjs(weather.value.time).format("dddd, MMM D, YYYY")
+);
 
 </script>
 
@@ -14,7 +20,7 @@ const { weather } = storeToRefs(currentWeatherStore);
 	<div class="wrapper">
 		<div class="left-info">
 			<span class="place">{{ city }}, {{ country }}</span>
-			<span class="date">Tuesday, Feb 11, 2026</span>
+			<span class="date">{{ currentTime }}</span>
 		</div>
 		<div class="right-info">
 			<img src="/icon-sunny.webp" alt="weather icon" width="110" height="110 "/>

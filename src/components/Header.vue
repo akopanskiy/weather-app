@@ -1,43 +1,29 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { getWeather } from "@/api/weatherClient.ts";
+import { useLocationStore } from "@/stores/location.ts";
+import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
+import { storeToRefs } from "pinia";
+import type { TemperatureUnit, WindSpeedUnit, PrecipitationUnit, Units } from "@/types";
+import { METRIC_OPTIONS } from "@/utils/constants.ts";
+
+const { setCurrentWeather, setUnits } = useCurrentWeatherStore();
+const locationStore = useLocationStore();
+const { latitude, longitude} = storeToRefs(locationStore);
 
 const selected = ref<string[]>([
 	'celsius',
-	'km/h',
-	'millimeters',
-])
-
-const options = [
-	{
-		label: 'Temperature',
-		options: [
-			{ value: 'celsius', label: 'Celsius(°C)' },
-			{ value: 'fahrenheit', label: 'Fahrenheit(°F)' },
-		],
-	},
-	{
-		label: 'Wind Speed',
-		options: [
-			{ value: 'km/h', label: 'km/h' },
-			{ value: 'mph', label: 'mph' },
-		],
-	},
-	{
-		label: 'Precipitation',
-		options: [
-			{ value: 'millimeters', label: 'Millimeters(mm)' },
-			{ value: 'inches', label: 'Inches(in)' },
-		],
-	},
-]
+	'ms',
+	'mm',
+]);
 
 const valueToIndex = Object.fromEntries(
-		options.flatMap((group, groupIndex) =>
+		METRIC_OPTIONS.flatMap((group, groupIndex) =>
 				group.options.map(opt => [opt.value, groupIndex])
 		)
 )
 
-const handleChange = (values: string[]): void => {
+const handleChange = async (values: string[]): Promise<void> => {
 	const last: string = values[values.length - 1]!;
 	const index: number = valueToIndex[last]!;
 	const next = [...selected.value];
@@ -45,6 +31,36 @@ const handleChange = (values: string[]): void => {
 	next[index] = last;
 	
 	selected.value = next;
+	
+	const weather = await getWeather({
+		latitude: latitude.value as number,
+		longitude: longitude.value as number,
+		temperature_unit: selected.value[0] as TemperatureUnit,
+		wind_speed_unit: selected.value[1] as WindSpeedUnit,
+		precipitation_unit: selected.value[2] as PrecipitationUnit,
+	});
+	console.log(weather);
+	const { temperature_2m, apparent_temperature, precipitation, relative_humidity_2m, wind_speed_10m, time } = weather.current;
+	
+	setCurrentWeather({
+		temperature: temperature_2m,
+		feelsLike: apparent_temperature,
+		precipitation: precipitation,
+		humidity: relative_humidity_2m,
+		windSpeed: wind_speed_10m,
+		currentDay: time,
+		maxTemperature: weather.daily.temperature_2m_max,
+		minTemperature: weather.daily.temperature_2m_min,
+		days: weather.daily.time,
+	});
+	
+	const newUnits: Units = {
+		temperature: next[0] as TemperatureUnit,
+		windSpeed: next[1] as WindSpeedUnit,
+		precipitation: next[2] as PrecipitationUnit,
+	};
+	
+	setUnits(newUnits);
 }
 </script>
 
@@ -76,7 +92,7 @@ const handleChange = (values: string[]): void => {
 				</div>
 			</template>
 			<el-option-group
-					v-for="group in options"
+					v-for="group in METRIC_OPTIONS"
 					:key="group.label"
 					:label="group.label"
 			>

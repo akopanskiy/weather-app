@@ -1,18 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import _ from "lodash";
-
-type TemperatureUnit = "celsius" | "fahrenheit";
-type WindSpeedUnit = "ms" | "mph";
-type PrecipitationUnit = "mm" | "inch";
-
-type CurrentWeather = {
-    temperature: number;
-    feelsLike: number;
-    precipitation: number;
-    humidity: number;
-    windSpeed: number;
-};
+import type { CurrentWeather, Units } from "@/types";
 
 export const useCurrentWeatherStore = defineStore("currentWeather", () => {
     const weather = ref<CurrentWeather>({
@@ -21,30 +10,40 @@ export const useCurrentWeatherStore = defineStore("currentWeather", () => {
         precipitation: 0,
         humidity: 0,
         windSpeed: 0,
+        currentDay: "",
+        maxTemperature: [],
+        minTemperature: [],
+        days: []
     });
 
-    const units = ref({
-        temperature: "celsius" as TemperatureUnit,
-        windSpeed: "ms" as WindSpeedUnit,
-        precipitation: "mm" as PrecipitationUnit,
+    const units = ref<Units>({
+        temperature: "celsius",
+        windSpeed: "ms",
+        precipitation: "mm",
     });
 
     const setCurrentWeather = (
         data: CurrentWeather,
-        newUnits?: Partial<typeof units.value>
     ) => {
         weather.value = {
             temperature: _.round(data.temperature, 0),
             feelsLike: _.round(data.feelsLike, 0),
-            precipitation: data.precipitation,
+            precipitation: _.round(data.precipitation, 0),
             humidity: data.humidity,
             windSpeed: _.round(data.windSpeed, 0),
+            currentDay: data.currentDay,
+            maxTemperature: data.maxTemperature,
+            minTemperature: data.minTemperature,
+            days: data.days
         };
-
-        if (newUnits) {
-            units.value = { ...units.value, ...newUnits };
-        }
     };
 
-    return { weather, units, setCurrentWeather };
+    const setUnits = (newUnits: Partial<Units>) => {
+        units.value = {
+            ...units.value,
+            ...newUnits,
+        };
+    };
+
+    return { weather, units, setCurrentWeather, setUnits };
 });

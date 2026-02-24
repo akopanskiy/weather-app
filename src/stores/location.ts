@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useLocationStore = defineStore('location', () => {
-  const city = ref<string>("");
+  const city = ref<string>("Lviv");
   const latitude = ref<number | string>("");
   const longitude = ref<number | string>("");
   const country = ref<string>("");
