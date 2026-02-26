@@ -13,7 +13,8 @@ export const useCurrentWeatherStore = defineStore("currentWeather", () => {
         currentDay: "",
         maxTemperature: [],
         minTemperature: [],
-        days: []
+        days: [],
+        weatherCode: []
     });
 
     const units = ref<Units>({
@@ -34,7 +35,8 @@ export const useCurrentWeatherStore = defineStore("currentWeather", () => {
             currentDay: data.currentDay,
             maxTemperature: data.maxTemperature,
             minTemperature: data.minTemperature,
-            days: data.days
+            days: data.days,
+            weatherCode: data.weatherCode
         };
     };
 

@@ -45,6 +45,7 @@ const sendCityName = async () => {
 		maxTemperature: weather.daily.temperature_2m_max,
 		minTemperature: weather.daily.temperature_2m_min,
 		days: weather.daily.time,
+		weatherCode: weather.daily.weathercode
 	});
 	
 	searchData.value = "";

@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useLocationStore } from "@/stores/location.ts";
 import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
+import { getWeatherIcon } from "@/utils/utils.ts";
 import { storeToRefs } from "pinia";
 import dayjs from "dayjs";
 
@@ -14,6 +15,8 @@ const currentTime = computed(() =>
 		dayjs(weather.value.time).format("dddd, MMM D, YYYY")
 );
 
+const weatherIcon = computed(() => getWeatherIcon(weather.value.weatherCode[0] as number));
+
 </script>
 
 <template>
@@ -23,7 +26,7 @@ const currentTime = computed(() =>
 			<span class="date">{{ currentTime }}</span>
 		</div>
 		<div class="right-info">
-			<img src="/icon-sunny.webp" alt="weather icon" width="110" height="110 "/>
+			<img :src=weatherIcon alt="weather icon" width="110" height="110 "/>
 			<span class="temperature">{{ weather.temperature }}°</span>
 		</div>
 	</div>

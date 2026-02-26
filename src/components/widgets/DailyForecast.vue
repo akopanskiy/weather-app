@@ -2,34 +2,25 @@
 import { computed } from "vue";
 import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
 import { storeToRefs } from "pinia";
+import { getWeatherIcon } from "@/utils/utils.ts";
 import dayjs from "dayjs";
 import _ from "lodash";
 
 const currentWeatherStore = useCurrentWeatherStore();
 const { weather } = storeToRefs(currentWeatherStore);
 
-// const forecastDat = [
-// 	{ day: "Mon", image: "/icon-sunny.webp", maxDayTemperature: "5°", minDayTemperature: "-1°" },
-// 	{ day: "Tue", image: "/icon-drizzle.webp", maxDayTemperature: "7°", minDayTemperature: "-2°" },
-// 	{ day: "Wed", image: "/icon-fog.webp", maxDayTemperature: "4°", minDayTemperature: "2°" },
-// 	{ day: "Thu", image: "/icon-rain.webp", maxDayTemperature: "2°", minDayTemperature: "0°" },
-// 	{ day: "Fri", image: "/icon-storm.webp", maxDayTemperature: "7°", minDayTemperature: "-1°" },
-// 	{ day: "Sat", image: "/icon-overcast.webp", maxDayTemperature: "7°", minDayTemperature: "-1°" },
-// 	{ day: "Sun", image: "/icon-partly-cloudy.webp", maxDayTemperature: "9°", minDayTemperature: "1°" },
-// ];
-
 const forecastData = computed(() => {
 	if (!weather.value)
 		return [];
 	
-	const { days, maxTemperature, minTemperature } = weather.value;
+	const { days, maxTemperature, minTemperature, weatherCode } = weather.value;
 	
 	return days.map((day: string, index: number) => {
 		const dayName = dayjs(day).format("ddd");
 		
 		return {
 			day: dayName,
-			image: "/icon-sunny.webp",
+			image: getWeatherIcon(weatherCode[index] as number),
 			maxDayTemperature: `${_.round(maxTemperature[index] as number, 0)}°`,
 			minDayTemperature: `${_.round(minTemperature[index] as number, 0)}°`,
 		};

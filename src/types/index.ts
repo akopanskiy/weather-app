@@ -12,6 +12,7 @@ export type CurrentWeather = {
     maxTemperature: number[];
     minTemperature: number[];
     days: string[];
+    weatherCode: number[]
 };
 
 export type Units = {
