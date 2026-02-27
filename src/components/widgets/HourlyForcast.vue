@@ -9,12 +9,10 @@ const day = ref<string>("");
 const currentWeatherStore = useCurrentWeatherStore();
 const { weather } = storeToRefs(currentWeatherStore);
 
-const { days, hourlyTemperature, hours, hourlyWeatherCode } = weather.value;
-
 onMounted(() => day.value = dayjs(weather.value.days[0]).format("dddd"));
 
 const getDays = computed(() => {
-	return days.map((day: string) => {
+	return weather.value.days.map((day: string) => {
 		const dayName = dayjs(day).format("dddd");
 		
 		return { label: dayName, value: dayName };
@@ -29,9 +27,9 @@ const getHourlyForecast = computed(() => {
 	const startIndex = dayIndex.value * 24;
 	const endIndex = startIndex + 24;
 	
-	const hoursArr = hours.slice(startIndex, endIndex);
-	const temperatureArr = hourlyTemperature.slice(startIndex, endIndex);
-	const weatherCodeArr = hourlyWeatherCode.slice(startIndex, endIndex);
+	const hoursArr = weather.value.hours.slice(startIndex, endIndex);
+	const temperatureArr = weather.value.hourlyTemperature.slice(startIndex, endIndex);
+	const weatherCodeArr = weather.value.hourlyWeatherCode.slice(startIndex, endIndex);
 	
 	return hoursArr.map((hour, index) => ({
 		hour: dayjs(hour).format("h A"),
