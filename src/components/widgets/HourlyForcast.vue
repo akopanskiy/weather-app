@@ -1,25 +1,44 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
+import { storeToRefs } from "pinia";
+import { getWeatherIcon } from "@/utils/utils.ts";
+import dayjs from "dayjs";
+import _ from "lodash";
 
-const days = [ { label: "Monday", value: "Monday" }, { label: "Tuesday", value: "Tuesday" },
-	{ label: "Wednesday", value: "Wednesday" }, { label: "Thursday", value: "Thursday" },
-	{ label: "Friday", value: "Friday" }, { label: "Saturday", value: "Saturday" },
-	{ label: "Sunday", value: "Sunday" },];
+const day = ref<string>("");
+const currentWeatherStore = useCurrentWeatherStore();
+const { weather } = storeToRefs(currentWeatherStore);
 
-const indicators = [
-	{ image: "/icon-sunny.webp", hour: "1 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "2 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "3 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "4 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "5 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "6 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "7 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "8 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "9 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "10 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "1 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "2 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "3 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "4 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "5 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "6 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "7 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "8 PM", temperature: "0°" },
-	{ image: "/icon-sunny.webp", hour: "9 PM", temperature: "0°" }, { image: "/icon-sunny.webp", hour: "10 PM", temperature: "0°" }
-];
+const { days, hourlyTemperature, hours, hourlyWeatherCode } = weather.value;
 
-const day = ref<string>("Monday");
+onMounted(() => day.value = dayjs(weather.value.days[0]).format("dddd"));
+
+const getDays = computed(() => {
+	return days.map((day: string) => {
+		const dayName = dayjs(day).format("dddd");
+		
+		return { label: dayName, value: dayName };
+	});
+});
+
+const dayIndex = computed(() =>
+		getDays.value.findIndex((item) => item.value === day.value)
+);
+
+const getHourlyForecast = computed(() => {
+	const startIndex = dayIndex.value * 24;
+	const endIndex = startIndex + 24;
+	
+	const hoursArr = hours.slice(startIndex, endIndex);
+	const temperatureArr = hourlyTemperature.slice(startIndex, endIndex);
+	const weatherCodeArr = hourlyWeatherCode.slice(startIndex, endIndex);
+	
+	return hoursArr.map((hour, index) => ({
+		hour: dayjs(hour).format("h A"),
+		temperature: `${_.round(temperatureArr[index] as number, 0)}°`,
+		image: getWeatherIcon(weatherCodeArr[index] as number)
+	}));
+});
 
 </script>
 
@@ -35,22 +54,22 @@ const day = ref<string>("Monday");
 					:teleported="false"
 			>
 					<el-option
-							v-for="(day, i) in days"
+							v-for="(item, i) in getDays"
 							:key="i"
-							:label="day.label"
-							:value="day.value"
+							:label="item.label"
+							:value="item.value"
 					/>
 			</el-select>
 		</div>
 		<div class="hourly-forecast-body">
 			<div class="indicators">
 				<div
-						v-for="(item, i) in indicators"
+						v-for="(item, i) in getHourlyForecast"
 						:key="i"
 						class="item"
 				>
 					<div class="left-indicators">
-						<img :src="item.image" alt="sign" width="36" height="36" />
+						<img :src=item.image alt="sign" width="36" height="36" />
 						<span :style="{ 'padding-top': '4px' }">{{ item.hour }}</span>
 					</div>
 					<div>{{ item.temperature }}</div>

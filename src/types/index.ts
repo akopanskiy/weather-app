@@ -12,7 +12,10 @@ export type CurrentWeather = {
     maxTemperature: number[];
     minTemperature: number[];
     days: string[];
-    weatherCode: number[]
+    weatherCode: number[],
+    hourlyTemperature: number[],
+    hours: string[],
+    hourlyWeatherCode: number[]
 };
 
 export type Units = {
@@ -26,6 +29,8 @@ export type CurrentWeatherParams = {
     longitude: number;
     current?: string;
     daily?: string;
+    hourly?: string;
+    forecast_days?: number;
     temperature_unit?: TemperatureUnit;
     wind_speed_unit?: WindSpeedUnit;
     precipitation_unit?: PrecipitationUnit;

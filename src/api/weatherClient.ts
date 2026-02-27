@@ -8,6 +8,8 @@ export const getWeather = async (params: CurrentWeatherParams): Promise<CurrentW
             ...params,
             current: "temperature_2m,apparent_temperature,wind_speed_10m,relative_humidity_2m,precipitation",
             daily: "temperature_2m_max,temperature_2m_min,weathercode",
+            hourly: "temperature_2m,weathercode",
+            forecast_days: 7,
             timezone: "auto",
         },
     });
