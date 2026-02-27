@@ -1,8 +1,8 @@
 import axios from "axios";
-import type { CurrentWeather, CurrentWeatherParams } from "@/types";
+import type { CurrentWeatherParams, WeatherApiResponse } from "@/types";
 import { WEATHER_CLIENT_URL } from "@/utils/constants.ts";
 
-export const getWeather = async (params: CurrentWeatherParams): Promise<CurrentWeather> => {
+export const getWeather = async (params: CurrentWeatherParams): Promise<WeatherApiResponse> => {
     const { data } = await axios.get(`${WEATHER_CLIENT_URL}/forecast`, {
         params: {
             ...params,

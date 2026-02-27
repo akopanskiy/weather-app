@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { getCity } from "@/api/geoClient.ts";
 import { getWeather } from "@/api/weatherClient.ts";
+import { mapWeatherResponse } from "@/mappers/weatherMappers.ts";
 import { useLocationStore } from "@/stores/location.ts";
 import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
 import { Search } from '@element-plus/icons-vue';
@@ -33,23 +34,8 @@ const sendCityName = async () => {
 	
 	console.log(weather);
 	
-	const { temperature_2m, apparent_temperature, precipitation, relative_humidity_2m, wind_speed_10m, time } = weather.current;
-	
-	setCurrentWeather({
-		temperature: temperature_2m,
-		feelsLike: apparent_temperature,
-		precipitation: precipitation,
-		humidity: relative_humidity_2m,
-		windSpeed: wind_speed_10m,
-		currentDay: time,
-		maxTemperature: weather.daily.temperature_2m_max,
-		minTemperature: weather.daily.temperature_2m_min,
-		days: weather.daily.time,
-		weatherCode: weather.daily.weathercode,
-		hourlyTemperature: weather.hourly.temperature_2m,
-		hours: weather.hourly.time,
-		hourlyWeatherCode: weather.hourly.weathercode
-	});
+	const mapped = mapWeatherResponse(weather);
+	setCurrentWeather(mapped);
 	
 	searchData.value = "";
 };

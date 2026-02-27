@@ -6,22 +6,16 @@ import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
 import { storeToRefs } from "pinia";
 import type { TemperatureUnit, WindSpeedUnit, PrecipitationUnit, Units } from "@/types";
 import { METRIC_OPTIONS } from "@/utils/constants.ts";
+import { mapWeatherResponse } from "@/mappers/weatherMappers.ts";
 
 const { setCurrentWeather, setUnits } = useCurrentWeatherStore();
 const locationStore = useLocationStore();
 const { latitude, longitude} = storeToRefs(locationStore);
 
-const selected = ref<string[]>([
-	'celsius',
-	'ms',
-	'mm',
-]);
+const selected = ref<string[]>(['celsius', 'ms', 'mm']);
 
-const valueToIndex = Object.fromEntries(
-		METRIC_OPTIONS.flatMap((group, groupIndex) =>
-				group.options.map(opt => [opt.value, groupIndex])
-		)
-)
+const valueToIndex = Object.fromEntries(METRIC_OPTIONS.flatMap((group, groupIndex) =>
+				group.options.map(opt => [opt.value, groupIndex])));
 
 const handleChange = async (values: string[]): Promise<void> => {
 	const last: string = values[values.length - 1]!;
@@ -40,23 +34,8 @@ const handleChange = async (values: string[]): Promise<void> => {
 		precipitation_unit: selected.value[2] as PrecipitationUnit,
 	});
 	console.log(weather);
-	const { temperature_2m, apparent_temperature, precipitation, relative_humidity_2m, wind_speed_10m, time } = weather.current;
-	
-	setCurrentWeather({
-		temperature: temperature_2m,
-		feelsLike: apparent_temperature,
-		precipitation: precipitation,
-		humidity: relative_humidity_2m,
-		windSpeed: wind_speed_10m,
-		currentDay: time,
-		maxTemperature: weather.daily.temperature_2m_max,
-		minTemperature: weather.daily.temperature_2m_min,
-		days: weather.daily.time,
-		weatherCode: weather.daily.weathercode,
-		hourlyTemperature: weather.hourly.temperature_2m,
-		hours: weather.hourly.time,
-		hourlyWeatherCode: weather.hourly.weathercode
-	});
+	const mapped = mapWeatherResponse(weather);
+	setCurrentWeather(mapped);
 	
 	const newUnits: Units = {
 		temperature: next[0] as TemperatureUnit,

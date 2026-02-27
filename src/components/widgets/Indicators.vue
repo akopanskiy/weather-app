@@ -7,10 +7,10 @@ const currentWeatherStore = useCurrentWeatherStore();
 const { weather, units } = storeToRefs(currentWeatherStore);
 
 const indicators = computed(() => [
-	{ name: "Feels Like", value: `${weather.value.feelsLike}°` },
-	{ name: "Humidity", value: `${weather.value.humidity}%` },
-	{ name: "Wind", value: `${weather.value.windSpeed} ${units.value.windSpeed}` },
-	{ name: "Precipitation", value: `${weather.value.precipitation} ${units.value.precipitation}` }
+	{ name: "Feels Like", value: `${weather.value?.feelsLike}°` },
+	{ name: "Humidity", value: `${weather.value?.humidity}%` },
+	{ name: "Wind", value: `${weather.value?.windSpeed} ${units.value.windSpeed}` },
+	{ name: "Precipitation", value: `${weather.value?.precipitation} ${units.value.precipitation}` }
 ]);
 </script>
 

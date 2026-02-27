@@ -9,10 +9,10 @@ const day = ref<string>("");
 const currentWeatherStore = useCurrentWeatherStore();
 const { weather } = storeToRefs(currentWeatherStore);
 
-onMounted(() => day.value = dayjs(weather.value.days[0]).format("dddd"));
+onMounted(() => day.value = dayjs(weather.value?.days[0]).format("dddd"));
 
 const getDays = computed(() => {
-	return weather.value.days.map((day: string) => {
+	return weather.value?.days.map((day: string) => {
 		const dayName = dayjs(day).format("dddd");
 		
 		return { label: dayName, value: dayName };
@@ -20,18 +20,20 @@ const getDays = computed(() => {
 });
 
 const dayIndex = computed(() =>
-		getDays.value.findIndex((item) => item.value === day.value)
+		getDays.value?.findIndex((item) => item.value === day.value)
 );
 
 const getHourlyForecast = computed(() => {
-	const startIndex = dayIndex.value * 24;
+	if (!weather.value) return [];
+	
+	const startIndex = dayIndex.value! * 24;
 	const endIndex = startIndex + 24;
 	
-	const hoursArr = weather.value.hours.slice(startIndex, endIndex);
-	const temperatureArr = weather.value.hourlyTemperature.slice(startIndex, endIndex);
-	const weatherCodeArr = weather.value.hourlyWeatherCode.slice(startIndex, endIndex);
+	const hoursArr = weather.value?.hours.slice(startIndex, endIndex);
+	const temperatureArr = weather.value?.hourlyTemperature.slice(startIndex, endIndex);
+	const weatherCodeArr = weather.value?.hourlyWeatherCode.slice(startIndex, endIndex);
 	
-	return hoursArr.map((hour, index) => ({
+	return hoursArr?.map((hour, index) => ({
 		hour: dayjs(hour).format("h A"),
 		temperature: `${_.round(temperatureArr[index] as number, 0)}°`,
 		image: getWeatherIcon(weatherCodeArr[index] as number)

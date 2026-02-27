@@ -12,10 +12,10 @@ const { city, country } = storeToRefs(locationStore);
 const { weather } = storeToRefs(currentWeatherStore);
 
 const currentTime = computed(() =>
-		dayjs(weather.value.time).format("dddd, MMM D, YYYY")
+		dayjs(weather.value?.currentDay).format("dddd, MMM D, YYYY")
 );
 
-const weatherIcon = computed(() => getWeatherIcon(weather.value.weatherCode[0] as number));
+const weatherIcon = computed(() => getWeatherIcon(weather.value?.weatherCode[0] as number));
 
 </script>
 
@@ -27,7 +27,7 @@ const weatherIcon = computed(() => getWeatherIcon(weather.value.weatherCode[0] a
 		</div>
 		<div class="right-info">
 			<img :src=weatherIcon alt="weather icon" width="110" height="110 "/>
-			<span class="temperature">{{ weather.temperature }}°</span>
+			<span class="temperature">{{ weather?.temperature }}°</span>
 		</div>
 	</div>
 </template>
