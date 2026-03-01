@@ -13,6 +13,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     CityTemperature: typeof import('./src/components/widgets/CityTemperature.vue')['default']
     DailyForecast: typeof import('./src/components/widgets/DailyForecast.vue')['default']
+    ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']

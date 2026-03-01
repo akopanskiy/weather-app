@@ -69,3 +69,11 @@ export type GeoResult = {
 export type GeoResponse = {
     results: GeoResult[]
 }
+
+export interface AutocompleteCity {
+    value: string
+    latitude: number
+    longitude: number
+    name: string
+    country: string
+}

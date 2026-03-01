@@ -5,34 +5,52 @@ import { getWeather } from "@/api/weatherClient.ts";
 import { mapWeatherResponse } from "@/mappers/weatherMappers.ts";
 import { useLocationStore } from "@/stores/location.ts";
 import { useCurrentWeatherStore } from "@/stores/currentWeather.ts";
+import type { AutocompleteCity } from "@/types";
 import { Search } from '@element-plus/icons-vue';
 import { storeToRefs } from "pinia";
+import _ from "lodash";
 
-const searchData = ref<string>("");
 const { getLocationParams } = useLocationStore();
 const { setCurrentWeather } = useCurrentWeatherStore();
 const currentWeatherStore = useCurrentWeatherStore();
 const { units } = storeToRefs(currentWeatherStore);
 
+const searchData = ref<string>("");
+const selectedCity = ref<AutocompleteCity | null>(null);
 
-const sendCityName = async () => {
-	const data = await getCity(searchData.value);
+const querySearch = async (query: string, cb: (results: AutocompleteCity[]) => void) => {
+	if (!query) return cb([]);
 	
-	const params = data.results?.[0];
-	if (!params) return;
+	const data = await getCity(query);
 	
-	const { name, latitude, longitude, country } = params;
-	getLocationParams(name, latitude, longitude, country);
-	
-	const weather = await getWeather({
+	const cities: AutocompleteCity[] = (data.results || []).map(({ name, admin2, country, latitude, longitude } = city) => ({
+		value: `${name}, ${admin2}, ${country}`,
 		latitude,
 		longitude,
+		name,
+		country
+	}))
+	
+	cb(cities)
+};
+
+const handleSelect = (item: AutocompleteCity) => {
+	selectedCity.value = item
+	
+	const { name, latitude, longitude, country } = item;
+	getLocationParams(name, latitude, longitude, country);
+}
+
+const debouncedQuerySearch = _.debounce(querySearch, 1500);
+
+const sendCityName = async () => {
+	const weather = await getWeather({
+		latitude: selectedCity.value?.latitude as number,
+		longitude: selectedCity.value?.longitude as number,
 		temperature_unit: units.value.temperature,
 		wind_speed_unit: units.value.windSpeed,
 		precipitation_unit: units.value.precipitation,
 	});
-	
-	console.log(weather);
 	
 	const mapped = mapWeatherResponse(weather);
 	setCurrentWeather(mapped);
@@ -40,17 +58,17 @@ const sendCityName = async () => {
 	searchData.value = "";
 };
 
-
-
 </script>
 
 <template>
 	<div class="search-wrapper">
-		<el-input
+		<el-autocomplete
 				v-model="searchData"
 				class="search-input"
 				placeholder="Search for a place"
 				:prefix-icon="Search"
+				:fetch-suggestions="debouncedQuerySearch"
+				@select="handleSelect"
 		/>
 		<el-button
 				type="primary"
