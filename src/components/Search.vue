@@ -64,7 +64,7 @@ const sendCityName = async () => {
 	<div class="search-wrapper">
 		<el-autocomplete
 				v-model="searchData"
-				class="search-input"
+				popper-class="autocomplete"
 				placeholder="Search for a place"
 				:prefix-icon="Search"
 				:fetch-suggestions="debouncedQuerySearch"
@@ -86,7 +86,7 @@ const sendCityName = async () => {
 	gap: 10px;
 }
 
-.search-input {
+:deep(.el-autocomplete) {
 	width: 400px;
 }
 
